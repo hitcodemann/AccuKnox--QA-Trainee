@@ -1,0 +1,86 @@
+To achieve the objective of containerizing and deploying the Wisecow application on a Kubernetes environment with secure TLS communication and an automated CI/CD pipeline, we can break down the tasks into the following steps:
+
+Step-by-Step Guide:
+1. Dockerization
+    1.Clone the Wisecow repository:
+
+                 $ git clone https://github.com/nyrahul/wisecow.git
+                 $ cd wisecow
+
+    2 . Create a Dockerfile:
+                   Create a Dockerfile in the root directory of the Wisecow application:
+
+
+                     # Use an official Python runtime as a parent image
+                            FROM python:3.9-slim
+
+                     # Set the working directory in the container
+                            WORKDIR /app
+
+                    # Copy the current directory contents into the container at /app
+                            COPY . /app
+
+                     # Install any needed packages specified in requirements.txt
+                             RUN pip install --no-cache-dir -r requirements.txt
+
+                    # Make port 80 available to the world outside this container
+                            EXPOSE 80
+
+                    # Define environment variable
+                            ENV NAME World
+
+                    # Run app.py when the container launches
+                            CMD ["python", "app.py"]
+
+
+       3 . Build the Docker image:
+
+                 $ docker build -t wisecow:latest .
+
+
+       4 . Run the Docker container:
+
+                 $ docker run -p 80:80 wisecow:latest 
+
+
+2 . Kubernetes deployment :
+
+        1.Create Kubernetes manifest files:
+          Create a k8s directory in the root of the repository and add the following files:
+                     "deployment.yaml"
+                     "service.yaml"
+
+        2. Deploy the application to Kubernetes:
+ 
+                    $ kubectl apply -f k8s/deployment.yaml
+                    $ kubectl apply -f k8s/service.yaml
+
+3.  Continuous Integration and Deployment (CI/CD)
+        1. Set up GitHub Actions workflow:
+             Create a .github/workflows directory in the root of the repository and add the following workflow file 
+                      "ci-cd.yml"
+        
+       2. Add GitHub Secrets:
+            In your GitHub repository, navigate to Settings > Secrets and variables > Actions and add the following secrets:
+
+            'DOCKER_HUB_USERNAME'
+            'DOCKER_HUB_PASSWORD'
+            'KUBE_CONFIG'
+
+4.  TLS Implementation
+      1. Generate TLS certificates:
+            You can use Lets Encrypt for TLS certificates. For a more detailed setup, refer to the Kubernetes documentation on setting up TLS:
+                  $ kubectl create secret tls wisecow-tls --cert=path/to/tls.crt --key=path/to/tls.key
+
+      2. Update Kubernetes manifests for TLS:
+                "imgress.yaml"
+
+      3.  Deploy Ingress:
+                 $ kubectl apply -f k8s/ingress.yaml
+
+Final Steps:
+--> Commit all your changes to the GitHub repository.
+--> Push your code to GitHub, triggering the CI/CD pipeline.
+By following these steps, you will have successfully containerized the Wisecow application, deployed it to a Kubernetes environment with a CI/CD pipeline, and secured it with TLS communication.
+
+    
